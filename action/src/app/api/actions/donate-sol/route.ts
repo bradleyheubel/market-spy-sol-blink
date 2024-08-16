@@ -16,9 +16,9 @@ import {
 } from '@solana/web3.js';
 import * as splToken from '@solana/spl-token';
 
-const pubkeyMap: Record<string, string> = {
-  ["USDC"]: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  ["BONK"]: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+const pubkeyMap: Record<string, [string, number]> = {
+  ["USDC"]: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 6],
+  ["BONK"]: ["DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 5]
 }
 
 export const GET = async (req: Request) => {
@@ -133,8 +133,8 @@ export const GET = async (req: Request) => {
 
       instructions.push(transferSolInstruction)
     } else {
-      const decimals = 6; // In the example, we use 6 decimals for USDC, but you can use any SPL token
-      const mintAddress = new PublicKey(`${pubkeyMap[token]}`); // replace this with any SPL token mint address
+      const decimals = pubkeyMap[token][1]; // In the example, we use 6 decimals for USDC, but you can use any SPL token
+      const mintAddress = new PublicKey(`${pubkeyMap[token][0]}`); // replace this with any SPL token mint address
 
       // converting value to fractional units
 
