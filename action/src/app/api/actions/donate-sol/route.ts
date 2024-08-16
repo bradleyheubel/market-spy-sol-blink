@@ -40,18 +40,6 @@ export const GET = async (req: Request) => {
         links: {
           actions: [
             {
-              label: 'Send 1 SOL', // button text
-              href: `${baseHref}&token=sol&amount=${'1'}`,
-            },
-            {
-              label: 'Send 5 SOL', // button text
-              href: `${baseHref}&token=sol&amount=${'5'}`,
-            },
-            {
-              label: 'Send 10 SOL', // button text
-              href: `${baseHref}&token=sol&amount=${'10'}`,
-            },
-            {
               label: 'Donate', // button text
               href: `${baseHref}&token={token}&amount={amount}`, // this href will have a text input
               parameters: [
@@ -136,7 +124,6 @@ export const GET = async (req: Request) => {
     let instructions = [];
     console.log(token)
     if (token == "SOL"){
-      console.log("sol selecte")
       // create an instruction to transfer native SOL from one wallet to another
       const transferSolInstruction = SystemProgram.transfer({
         fromPubkey: account,
@@ -146,7 +133,6 @@ export const GET = async (req: Request) => {
 
       instructions.push(transferSolInstruction)
     } else {
-      console.log(`${token} ${pubkeyMap[token]}`)
       const decimals = 6; // In the example, we use 6 decimals for USDC, but you can use any SPL token
       const mintAddress = new PublicKey(`${pubkeyMap[token]}`); // replace this with any SPL token mint address
 
@@ -171,11 +157,10 @@ export const GET = async (req: Request) => {
         splToken.TOKEN_PROGRAM_ID,
         splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       );
-      console.log(toTokenAccount)
+
       const ifexists = await connection.getAccountInfo(toTokenAccount);
 
       if (!ifexists || !ifexists.data) {
-        console.log("no exist")
         let createATAiX = splToken.createAssociatedTokenAccountInstruction(
           account,
           toTokenAccount,
