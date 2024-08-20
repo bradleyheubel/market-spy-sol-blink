@@ -15,27 +15,60 @@ import {
     Transaction,
 } from '@solana/web3.js';
 import * as splToken from '@solana/spl-token';
+import axios from "axios";
 
-const pubkeyMap: Record<string, [string, number]> = {
+const splPubkeyMap: Record<string, [string, number]> = {
   ["USDC"]: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 6],
   ["BONK"]: ["DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 5]
 }
+
+const pubkeyToDonateTo = '4ypD7kxRj9DLF3PMxsY3qvp8YdNhAHZRnN3fyVDh5CFX'
+const title = 'Donate to Market Spy'
+const icon = 'https://assets.marketspy.au/imgs/marketspy-logo-black.svg'
+const desc = "Help support tracking crypto prices from CEXs in real time!"
+const successMsg = "Thank you for your support!"
 
 export const GET = async (req: Request) => {
     try {
       const requestUrl = new URL(req.url);
       const { toPubkey } = validatedQueryParams(requestUrl);
+      let assetPrices = {"SOL": "0", "BONK": "0", "USDC": "1"}
+
+     const tokenPriceData = await axios.get("https://api.marketspy.au:8443/asset-price?asset=SOL&asset=BONK&quote=USDC")
   
       const baseHref = new URL(
         `/api/actions/donate-sol?to=${toPubkey.toBase58()}`,
         requestUrl.origin,
       ).toString();
+
+      if (tokenPriceData.data){
+        tokenPriceData.data.map((tokenDeets: { asset: string; price: string; }) => {
+          if (tokenDeets.asset == "SOL"){
+            assetPrices["SOL"] = parseFloat(tokenDeets.price).toFixed(2)
+          }
+          if (tokenDeets.asset == "BONK") {
+            assetPrices["BONK"] = parseFloat(tokenDeets.price).toFixed(8)
+          }
+        })
+      }
+
+      let options : Array<any> = [{
+        selected: true,
+        label: `SOL (~$${assetPrices["SOL"]} USD)`,
+        value: "SOL",
+      }]
+      Object.keys(splPubkeyMap).map(assetID => {
+        options.push({
+          label: `${assetID} (~$${assetPrices[assetID]} USD)`,
+          value: assetID,
+        })
+      })
   
       const payload: ActionGetResponse = {
-        title: 'Donate to Market Spy',
-        icon: 'https://assets.marketspy.au/imgs/marketspy-logo-black.svg',
+        title,
+        icon,
         description:
-          'Help support a free project tracking crypto prices from CEXs in real time!',
+          desc,
         label: 'Transfer', // this value will be ignored since `links.actions` exists
         links: {
           actions: [
@@ -46,21 +79,7 @@ export const GET = async (req: Request) => {
                 {
                   type: "select",
                   name: "token",
-                  options: [
-                    {
-                      label: "USDC",
-                      value: "USDC",
-                      selected: true
-                    },
-                    {
-                      label: "SOL",
-                      value: "SOL",
-                    },
-                    {
-                      label: "BONK",
-                      value: "BONK",
-                    },
-                  ],
+                  options,
                 },
                 {
                   type: "text",
@@ -133,8 +152,8 @@ export const GET = async (req: Request) => {
 
       instructions.push(transferSolInstruction)
     } else {
-      const decimals = pubkeyMap[token][1]; // In the example, we use 6 decimals for USDC, but you can use any SPL token
-      const mintAddress = new PublicKey(`${pubkeyMap[token][0]}`); // replace this with any SPL token mint address
+      const decimals = splPubkeyMap[token][1]; // In the example, we use 6 decimals for USDC, but you can use any SPL token
+      const mintAddress = new PublicKey(`${splPubkeyMap[token][0]}`); // replace this with any SPL token mint address
 
       // converting value to fractional units
 
@@ -195,7 +214,7 @@ export const GET = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: "Thank you for your support!",
+        message: successMsg,
       },
     });
     
@@ -206,7 +225,7 @@ export const GET = async (req: Request) => {
 
   function validatedQueryParams(requestUrl: URL) {
     let toPubkey: PublicKey = new PublicKey(
-      '4ypD7kxRj9DLF3PMxsY3qvp8YdNhAHZRnN3fyVDh5CFX',
+      pubkeyToDonateTo,
     );
     let amount: number = 0.1;
     let token: string = "SOL"
