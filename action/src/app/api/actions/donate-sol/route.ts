@@ -58,8 +58,9 @@ export const GET = async (req: Request) => {
         value: "SOL",
       }]
       Object.keys(splPubkeyMap).map(assetID => {
+        const price = assetPrices[assetID as keyof typeof assetPrices];
         options.push({
-          label: `${assetID} (~$${assetPrices[assetID]} USD)`,
+          label: `${assetID} (~$${price ? price : "N/A"} USD)`,
           value: assetID,
         })
       })
@@ -100,6 +101,7 @@ export const GET = async (req: Request) => {
       console.log(err);
       let message = 'An unknown error occurred';
       if (typeof err == 'string') message = err;
+      
       return new Response(message, {
         status: 400,
         headers: ACTIONS_CORS_HEADERS,
@@ -141,7 +143,7 @@ export const GET = async (req: Request) => {
     }
 
     let instructions = [];
-    console.log(token)
+  
     if (token == "SOL"){
       // create an instruction to transfer native SOL from one wallet to another
       const transferSolInstruction = SystemProgram.transfer({
