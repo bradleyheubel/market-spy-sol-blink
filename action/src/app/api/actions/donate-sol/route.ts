@@ -17,7 +17,7 @@ import {
 import * as splToken from '@solana/spl-token';
 import axios from "axios";
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 const splPubkeyMap: Record<string, [string, number]> = {
   ["USDC"]: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 6],
