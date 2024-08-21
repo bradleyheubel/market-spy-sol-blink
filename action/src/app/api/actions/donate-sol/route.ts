@@ -17,8 +17,6 @@ import {
 import * as splToken from '@solana/spl-token';
 import axios from "axios";
 
-export const runtime = 'experimental-edge';
-
 const splPubkeyMap: Record<string, [string, number]> = {
   ["USDC"]: ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 6],
   ["BONK"]: ["DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 5]
@@ -103,7 +101,7 @@ export const GET = async (req: Request) => {
       console.log(err);
       let message = 'An unknown error occurred';
       if (typeof err == 'string') message = err;
-
+      
       return new Response(message, {
         status: 400,
         headers: ACTIONS_CORS_HEADERS,
