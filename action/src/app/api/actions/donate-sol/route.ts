@@ -25,7 +25,7 @@ const splPubkeyMap: Record<string, [string, number]> = {
 const pubkeyToDonateTo = '4ypD7kxRj9DLF3PMxsY3qvp8YdNhAHZRnN3fyVDh5CFX'
 const title = 'Donate to Market Spy'
 const icon = 'https://assets.marketspy.au/imgs/marketspy-logo-black.svg'
-const desc = "Help support tracking crypto prices from CEXs in real time!"
+const desc = "Visit marketspy.au | Price data powered by Market Spy"
 const successMsg = "Thank you for your support!"
 
 export const GET = async (req: Request) => {
